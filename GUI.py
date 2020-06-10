@@ -15,6 +15,8 @@ class Gui_For_Office:
         self.start_page.pack_forget()
         self.questions_page.pack(expand=True, fill=BOTH)
 
+    def call_back_question(self,name):
+        print(name)
 
     def initUI(self):
         #set UI 
@@ -58,9 +60,12 @@ class Gui_For_Office:
         buttons_frame = Frame(self.questions_page)
         buttons_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
         services_cnt = 9
+        question_buttons = []
         for i in range(services_cnt//3):
             for j in range(3):
-                Button(buttons_frame,text = "test",width = 50,height = 10).grid(row = i, column = j, padx = 100, pady = 60)
+                cnt = i*3+j
+                question_buttons.append(Button(buttons_frame,text = cnt ,width = 50,height = 10,command = lambda x = cnt : print(x)))
+                question_buttons[cnt].grid(row = i, column = j, padx = 100, pady = 60)
 
         btn_cancel = Button(self.questions_page,text = "取消/上一頁", font =("微軟正黑體",30),command = self.to_start_page)
         btn_cancel.pack(anchor="n", side =LEFT)
