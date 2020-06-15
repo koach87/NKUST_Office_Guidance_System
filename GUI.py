@@ -1,4 +1,5 @@
 from tkinter import *
+
 import pandas as pd
 
 class Gui_For_Office:
@@ -17,6 +18,7 @@ class Gui_For_Office:
         self.questions_page.pack(expand=True, fill=BOTH)
 
     def btn_OK_click(self):
+        self.questions_label_var.set(self.std_id.get() +"您好，請選擇欲服務項目")
         print(self.std_id.get())
         self.to_questions_page()
 
@@ -26,15 +28,19 @@ class Gui_For_Office:
 
     def call_back_question(self,question_index):
         print(self.xls_services.values[question_index][0])
-        
+        print(self.xls_services.values[question_index][2])
+        import net
+        net.host(self.xls_services.values[question_index][0],int(self.xls_services.values[question_index][2]))
+
 
     def initUI(self):
         # get services
-        self.xls_services = pd.read_excel(r"C:\Users\user\Desktop\柯奇\py\Office_Guidace_System\GUI_services.xlsx", sheet_name= 0 )
+        self.xls_services = pd.read_excel("GUI_services.xlsx", sheet_name= 0 )
 
         # get stdlist
-        self.xls_stdlist = pd.read_excel(r"C:\Users\user\Desktop\柯奇\py\Office_Guidace_System\GUI_stdlist.xlsx", sheet_name= 0 )
-        
+        self.xls_stdlist = pd.read_excel("GUI_stdlist.xlsx", sheet_name= 0 )
+        self.xls_stdlist = self.xls_stdlist.set_index('std_num').T.to_dict('list')
+
         # set UI 
         self.master.state("zoom")
         self.master.title("Office Guidance System")
@@ -68,9 +74,8 @@ class Gui_For_Office:
         # qeustions page setting
         self.questions_page = Frame(self.master)
 
-        questions_label_var = StringVar()
-        questions_label = Label(self.questions_page,font = ("微軟正黑體",30), textvariable = questions_label_var)
-        questions_label_var.set(self.xls_stdlist. +"您好，請選擇欲服務項目")
+        self.questions_label_var = StringVar()
+        questions_label = Label(self.questions_page,font = ("微軟正黑體",30), textvariable = self.questions_label_var)
         questions_label.pack(anchor="n", side = TOP)
 
         buttons_frame = Frame(self.questions_page)
@@ -88,6 +93,7 @@ class Gui_For_Office:
         btn_cancel.pack(anchor="n", side =LEFT)
                 
         self.to_start_page()
+    
 
 
 

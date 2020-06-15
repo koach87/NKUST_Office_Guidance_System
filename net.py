@@ -1,7 +1,7 @@
 import socket, pandas
 
 BUFSIZE = 4096
-filename_excel = r"D:\Users\Koach\Desktop\net_test.xlsx"
+filename_excel = r"D:\Users\Koach\Desktop\Office_guidace_System\net_test.xlsx"
 def get_excel_col(staff_branch,data):
     for i in range(len(data['分機號碼'])):
         if data['分機號碼'][i] == staff_branch:
