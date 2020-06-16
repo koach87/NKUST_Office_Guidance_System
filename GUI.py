@@ -1,5 +1,4 @@
 from tkinter import *
-
 import pandas as pd
 
 class Gui_For_Office:
@@ -8,22 +7,42 @@ class Gui_For_Office:
         self.master = master
         self.initUI()
 
+    def cancel(self):
+        self.btn_cancel.pack(anchor="n", side =LEFT)
+        self.to_start_page()
+
     def to_start_page(self):
         self.std_id.delete(0, 'end')
         self.questions_page.pack_forget()
-        self.start_page.pack(expand=True, fill=BOTH)
+        self.tchr_page.pack_forget()
+        self.std_page.pack_forget()
+        self.start_page.place(relx=0.5, rely=0.5, anchor=CENTER)
 
     def to_questions_page(self):
+        self.btn_cancel.pack()
         self.start_page.pack_forget()
-        self.questions_page.pack(expand=True, fill=BOTH)
+        self.questions_page.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-    def btn_OK_click(self):
-        self.questions_label_var.set(self.std_id.get() +"您好，請選擇欲服務項目")
-        print(self.std_id.get())
+    def to_student_page(self):
+        self.start_page.pack_forget()
+        self.btn_cancel.pack()
+        self.std_page.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+# ================================================================================
+    # click action
+    def click_tchr(self):
+        pass
+
+    def click_std(self):
+        self.to_student_page()
+
+    def click_guest(self):
+        print('guest')
         self.to_questions_page()
 
-    def btn_guest_click(self):
-        print('guest')
+
+    def click_std_OK(self):
+        print(self.std_id.get())
         self.to_questions_page()
 
     def call_back_question(self,question_index):
@@ -42,40 +61,66 @@ class Gui_For_Office:
         self.xls_stdlist = self.xls_stdlist.set_index('std_num').T.to_dict('list')
 
         # set UI 
+        self.master.iconbitmap("nkust.ico")
         self.master.state("zoom")
         self.master.title("Office Guidance System")
+ 
+# ================================================================================
+        # cancel frame
+        cancel_frame = Frame(self.master, bg = "green").pack()
+        self.btn_cancel = Button(cancel_frame, text = "取消", font = ("微軟正黑體",20))
 
+# ================================================================================
         # start page setting
         self.start_page = Frame(self.master, bg="gray")
         start_page_middle = Frame(self.start_page,bg = "white")
 
         # Label of notice
-        notice_var = StringVar()
-        notice = Label(start_page_middle, textvariable = notice_var)
-        notice_var.set("請輸入學號")
-        notice.pack()        
+        Label(start_page_middle, text = "請選擇身分").pack()
 
         # middle widget
-        self.std_id = Entry(start_page_middle,width = 20)
+        self.btn_std = Button(start_page_middle,text = "學生",width = 25, command = self.click_std)
+        self.btn_std.pack()
+
+        # middle widget
+        self.btn_oth = Button(start_page_middle,text = "其他",width = 25, command = self.click_guest)
+        self.btn_oth.pack()
+
+        # middle widget
+        self.btn_tchr = Button(start_page_middle,text = "導師",width = 25, command = self.click_tchr)
+        self.btn_tchr.pack()
+
+        # middle frame setting
+        start_page_middle.pack()
+        # start_page_middle.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+# ================================================================================
+        # student page
+        self.std_page = Frame(self.master)
+
+        Label(self.std_page,text = "請輸入學號").pack()
+
+        self.std_id = Entry(self.std_page,width = 50)
         self.std_id.pack()
 
         # middle widget
-        btn_OK = Button(start_page_middle,text = "OK",width = 10,command = self.btn_OK_click)
-        btn_OK.pack()
+        std_btn_OK = Button(self.std_page,text = "確定",width = 25,command = self.click_std_OK)
+        std_btn_OK.pack()
 
-        # middle widget
-        btn_guest = Button(start_page_middle,text = "非學生請點我",width = 10, command = self.btn_guest_click)
-        btn_guest.pack()
+# ================================================================================
+        # teacher page
+        self.tchr_page = Frame(self.master)
+        Label(self.tchr_page, text = "請選擇所屬科系").pack()
+        
 
-        # middle frame setting
-        start_page_middle.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-
-        # qeustions page setting
+# ================================================================================
+        # qeustions page
         self.questions_page = Frame(self.master)
 
         self.questions_label_var = StringVar()
-        questions_label = Label(self.questions_page,font = ("微軟正黑體",30), textvariable = self.questions_label_var)
+
+        questions_label = Label(self.questions_page, font = ("微軟正黑體",30), textvariable = self.questions_label_var)
         questions_label.pack(anchor="n", side = TOP)
 
         buttons_frame = Frame(self.questions_page)
@@ -89,8 +134,11 @@ class Gui_For_Office:
                             command = lambda x = cnt : self.call_back_question(x))
                 b.grid(row = i, column = j, padx = 40, pady = 40)
 
-        btn_cancel = Button(self.questions_page,text = "取消", font =("微軟正黑體",25), command = self.to_start_page)
-        btn_cancel.pack(anchor="n", side =LEFT)
+        
+        # # nkust image
+        # im = PhotoImage(file = "nkust.gif")
+        # aa = Label(self.questions_page, image = im)
+        # aa.pack()
                 
         self.to_start_page()
     
