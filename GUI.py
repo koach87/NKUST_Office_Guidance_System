@@ -22,24 +22,29 @@ class Gui_For_Office:
 
     def to_questions_page(self):
         self.btn_cancel.pack(anchor="n", side =LEFT, padx = 10, pady = 10)
+        self.tchr_page.place_forget()
         self.start_page.place_forget()
         self.questions_page.place(relx=0.5, rely=0.5, anchor=CENTER)
 
     def to_student_page(self):
         self.start_page.place_forget()
+        self.tchr_page.place_forget()
         self.btn_cancel.pack(anchor="n", side =LEFT, padx = 10, pady = 10)
         self.std_page.place(relx=0.5, rely=0.5, anchor=CENTER)
 
     def to_dept_page(self):
         self.btn_cancel.pack(anchor="n", side =LEFT, padx = 10, pady = 10)
         self.start_page.place_forget()
+        self.tchr_page.place(relx=0.5, rely=0.5, anchor=CENTER)
         
 
 # ================================================================================
     # click action
     def click_tchr(self):
-        self.tchr_page.pack()
         self.to_dept_page()
+
+    def click_tchr_OK(self):
+        pass
 
     def click_std(self):
         self.to_student_page()
@@ -51,7 +56,6 @@ class Gui_For_Office:
             self.to_questions_page()
         else:
             messagebox.showerror('找不到該學號','請重新輸入，或至點擊下方連結查詢學號')
-            # messagebox.showinfo
 
     def return_dept(self):
         pass
@@ -62,23 +66,21 @@ class Gui_For_Office:
         print(self.xls_services.values[question_index][0])# 問題
         print(self.std_id.get())#學生學號
         print(self.xls_stdlist.get(self.std_id.get())[0])# 學生姓名
-        print(self.xls_services.values[question_index][2])#承辦人分機
 
         
-        messagebox.showinfo("國立高雄科技大學進推處教務組","{} \n請至 {} 號櫃台\n備註:\n{}".format(self.xls_services.values[question_index][0],456,self.xls_services.values[question_index][1]))
+        messagebox.showinfo("國立高雄科技大學進推處教務組","{} \n請至 {} 號櫃台\n備註:\n{}"
+                                .format(self.xls_services.values[question_index][0],self.xls_stdlist.get(self.std_id.get())[2],self.xls_services.values[question_index][1]))
+        print("分機:{}".format(self.xls_stdlist.get(self.std_id.get())[2]))
         self.to_start_page()
+
         # import net
+        # net.host()
         # net.host(self.xls_services.values[question_index][0],int(self.xls_services.values[question_index][2]))
         
 
 
     def initUI(self):
-        # get services
-        self.xls_services = pd.read_excel("GUI_services.xlsx", sheet_name= 0 )
 
-        # get stdlist
-        self.xls_stdlist = pd.read_excel("GUI_stdlist.xlsx", sheet_name= 0 )
-        self.xls_stdlist = self.xls_stdlist.astype(str).set_index('std_num').T.to_dict('list')
 
         # set UI 
         self.master.iconbitmap("nkust.ico")
@@ -111,6 +113,10 @@ class Gui_For_Office:
         # start_page_middle.place(relx=0.5, rely=0.5, anchor=CENTER)
 
 # ================================================================================ student page
+
+        # get stdlist
+        self.xls_stdlist = pd.read_excel("GUI_stdlist.xlsx", sheet_name= 0 )
+        self.xls_stdlist = self.xls_stdlist.astype(str).set_index('std_num').T.to_dict('list')
         
         self.std_page = Frame(self.master)
 
@@ -128,10 +134,11 @@ class Gui_For_Office:
         self.look_for_id.bind("<Button-1>", lambda e: self.callback("https://webap.nkust.edu.tw/nkust/system/getuid.jsp?kind=2"))
 
         
-        
-
 
 # ================================================================================ qeustions page
+        # get services
+        self.xls_services = pd.read_excel("GUI_services.xlsx", sheet_name= 0 )
+
         self.questions_page = Frame(self.master, bg = "black")
 
         questions_label = Label(self.questions_page, font = ("微軟正黑體",30), text = "請點選欲辦理項目")
@@ -150,19 +157,32 @@ class Gui_For_Office:
                 b.grid(row = i, column = j, padx = 40, pady = 40)
 
 
-# ================================================================================ teacher page
+
+# ================================================================================ question request page
+
+
+# ================================================================================ teacher's page
+        
+        dept_list = ''
+        with open('GUI_dept.txt', encoding= 'UTF-8') as f:
+            dept_list = f.read().split(' ')
+
         self.tchr_page = Frame(self.master)
         Label(self.tchr_page, font = ("微軟正黑體",30), text = "請選擇所屬科系").pack()
         dept_buttons_frame = Frame(self.tchr_page)
         dept_buttons_frame.pack()
-        dept_cnt = 12
-        for i in range(dept_cnt//3):
-            for j in range(3):
-                cnt = i*3+j
-                b = Button(dept_buttons_frame,text = self.xls_services.values[cnt][0] ,width = 30 ,height = 2 ,font =("微軟正黑體",24))
+        dept_cnt = 20
+        row = 4
+        for i in range(dept_cnt//row):
+            for j in range(row):
+                cnt = i*row+j
+                b = Button(dept_buttons_frame,text = dept_list[cnt] ,width = 15 ,height = 1 ,font =("微軟正黑體",24),
+                        command = lambda x = cnt : print(dept_list[x]))
                 b.grid(row = i, column = j, padx = 40, pady = 40)
 
         
+# ================================================================================ teacher's request page
+
 
         
         # # nkust image

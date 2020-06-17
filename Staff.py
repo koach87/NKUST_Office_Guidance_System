@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May 18 18:28:45 2020
+import net
+from win10toast import ToastNotifier
 
-@author: user
-"""
-
-'''
-set frame for news
-'''
+while True:
+    x = net.staff('localhost',6666)
+    toaster = ToastNotifier()
+    toaster.show_toast(u'{}'.format(x[0]), u'123')
+    print(x)
