@@ -57,27 +57,37 @@ class Gui_For_Office:
         else:
             messagebox.showerror('找不到該學號','請重新輸入，或至點擊下方連結查詢學號')
 
-    def return_dept(self):
-        pass
+    def return_tchr_dept(self, dept_index):
+        self.xls_dept_seat = pd.read_excel("GUI_services.xlsx", sheet_name= 1 )
+
+        import net
+        net.host("{}老師 t1 t2".format(self.xls_dept_seat.values[dept_index][0]), 22222)
+
+        messagebox.showinfo('國立高雄科技大學進推處教務組','請老師至{}號櫃台，由承辦人員為您服務。'
+                            .format(self.xls_dept_seat.values[dept_index][1]))
+
+        self.to_start_page()
+        
             
         
 
     def return_question(self,question_index):
-        print(self.xls_services.values[question_index][0])# 問題
-        print(self.std_id.get())#學生學號
-        print(self.xls_stdlist.get(self.std_id.get())[0])# 學生姓名
+        num = self.std_id.get() 
+        dept = self.xls_stdlist.get(num)[1]
+        name = self.xls_stdlist.get(num)[0]
+        question =  self.xls_services.values[question_index][0]
 
-        
+        print(num, dept, name, question)
+
+        import net
+        net.host("學生 {}系學生{}\n學號:{}\n辦理{}".format(dept, name, num, question), 22222)
+                
         messagebox.showinfo("國立高雄科技大學進推處教務組","{} \n請至 {} 號櫃台\n備註:\n{}"
                                 .format(self.xls_services.values[question_index][0],self.xls_stdlist.get(self.std_id.get())[2],self.xls_services.values[question_index][1]))
         print("分機:{}".format(self.xls_stdlist.get(self.std_id.get())[2]))
+
+    
         self.to_start_page()
-
-        # import net
-        # net.host()
-        # net.host(self.xls_services.values[question_index][0],int(self.xls_services.values[question_index][2]))
-        
-
 
     def initUI(self):
 
@@ -177,7 +187,7 @@ class Gui_For_Office:
             for j in range(row):
                 cnt = i*row+j
                 b = Button(dept_buttons_frame,text = dept_list[cnt] ,width = 15 ,height = 1 ,font =("微軟正黑體",24),
-                        command = lambda x = cnt : print(dept_list[x]))
+                        command = lambda x = cnt : self.return_tchr_dept(x))
                 b.grid(row = i, column = j, padx = 40, pady = 40)
 
         
