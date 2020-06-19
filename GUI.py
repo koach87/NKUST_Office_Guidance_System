@@ -59,12 +59,16 @@ class Gui_For_Office:
 
     def return_tchr_dept(self, dept_index):
         self.xls_dept_seat = pd.read_excel("GUI_services.xlsx", sheet_name= 1 )
-
-        import net
-        net.host("{}老師 t1 t2".format(self.xls_dept_seat.values[dept_index][0]), 22222)
+      
 
         messagebox.showinfo('國立高雄科技大學進推處教務組','請老師至{}號櫃台，由承辦人員為您服務。'
                             .format(self.xls_dept_seat.values[dept_index][1]))
+
+        # import net
+        # try:
+        #     net.host("{}老師 t1 t2".format(self.xls_dept_seat.values[dept_index][0]), 22222)
+        # except ConnectionRefusedError:
+        #     print('cannot link')      
 
         self.to_start_page()
         
@@ -73,22 +77,27 @@ class Gui_For_Office:
 
     def return_question(self,question_index):
         num = self.std_id.get() 
-        dept = self.xls_stdlist.get(num)[1]
         name = self.xls_stdlist.get(num)[0]
+        dept = self.xls_stdlist.get(num)[1]
+        tel = self.xls_stdlist.get(num)[2]
+        dept_num = self.xls_stdlist.get(num)[3]
         question =  self.xls_services.values[question_index][0]
+        question_remarks = self.xls_services.values[question_index][1]
 
         print(num, dept, name, question)
-
-        import net
-        net.host("學生 {}系學生{}\n學號:{}\n辦理{}".format(dept, name, num, question), 22222)
                 
         messagebox.showinfo("國立高雄科技大學進推處教務組","{} \n請至 {} 號櫃台\n備註:\n{}"
-                                .format(self.xls_services.values[question_index][0],self.xls_stdlist.get(self.std_id.get())[2],self.xls_services.values[question_index][1]))
-        print("分機:{}".format(self.xls_stdlist.get(self.std_id.get())[2]))
+                                .format(question, dept_num, question_remarks))
+        print("分機:{}".format(tel))
 
-    
         self.to_start_page()
 
+        # import net
+        # try:
+        #     net.host("學生 {}系學生{}\n學號:{}\n辦理{}".format(dept, name, num, question), 22222)
+        # except ConnectionRefusedError:
+        #     print('cannot link') 
+    
     def initUI(self):
 
 
