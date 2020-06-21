@@ -1,4 +1,5 @@
-import socket, pandas
+from pandas import read_excel
+import socket
 
 BUFSIZE = 4096
 filename_excel = "net_tel_ip.xlsx"
@@ -9,7 +10,7 @@ def get_excel_col(staff_branch,data):
             return i
          
 def get_staff_host(staff_branch):
-    excel_data_df = pandas.read_excel(filename_excel, sheet_name='staff_host')
+    excel_data_df = read_excel(filename_excel, sheet_name='staff_host')
     data = excel_data_df.to_dict()
     col = get_excel_col(staff_branch,data)
     return get_excel_col_to_host(col,data)
@@ -25,7 +26,8 @@ def host(data,staff_branch): #送data給 staff
     sock.send(data.encode('utf-8'))
     sock.close()
 
-def staff(host, port):  # 等待資料傳送過來 接受完後關閉，接受後需在call一次  
+def staff(port):  # 等待資料傳送過來 接受完後關閉，接受後需在call一次  
+    host = socket.gethostbyname(socket.gethostname())
     listeningSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     listeningSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     listeningSock.bind((host, port))

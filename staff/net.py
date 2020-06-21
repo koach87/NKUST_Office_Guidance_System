@@ -25,7 +25,9 @@ def host(data,staff_branch): #送data給 staff
     sock.send(data.encode('utf-8'))
     sock.close()
 
-def staff(host, port):  # 等待資料傳送過來 接受完後關閉，接受後需在call一次  
+def staff(port):  # 等待資料傳送過來 接受完後關閉，接受後需在call一次  
+    host = socket.gethostbyname(socket.gethostname())
+    print(host)
     listeningSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     listeningSock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     listeningSock.bind((host, port))

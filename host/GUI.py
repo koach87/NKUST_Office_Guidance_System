@@ -1,10 +1,9 @@
 from tkinter import *
 from tkinter import messagebox
 import pandas as pd
-import webbrowser
+from webbrowser import open_new
 import storage
 import net
-
 class Gui_For_Office:
 
     def __init__(self,master):
@@ -12,13 +11,16 @@ class Gui_For_Office:
         self.initUI()
 
     def callback(self, url):
-        webbrowser.open_new(url)
+        open_new(url)
     
     def send_message(self, identity, dept, name, num , question, tel):
         try:
-            net.host("{} {}系學生{}\n學號:{}\n辦理{}".format(identity, dept, name, num, question), tel)
-        except ConnectionRefusedError:
-            print('cannot link') 
+            if(identity=='學生'):
+                net.host("學生 {}系{}\n學號:{}\n辦理{}".format(dept, name, num, question), int(tel))
+            else:
+                net.host("老師 {}老師來囉~".format(dept), tel)
+        except ConnectionRefusedError as e:
+            print(e) 
 
     def to_start_page(self):
         self.btn_cancel.pack_forget()
@@ -50,9 +52,6 @@ class Gui_For_Office:
     # click action
     def click_tchr(self):
         self.to_dept_page()
-
-    def click_tchr_OK(self):
-        pass
 
     def click_std(self):
         self.to_student_page()
@@ -104,12 +103,8 @@ class Gui_For_Office:
         self.to_start_page()
         
         storage.add_data_to_history('學生', num, name, dept, question)
-
-        # import net
-        # try:
-        #     net.host("學生 {}系學生{}\n學號:{}\n辦理{}".format(dept, name, num, question), 22222)
-        # except ConnectionRefusedError:
-        #     print('cannot link') 
+        # identity, dept, name, num , question, tel
+        self.send_message('學生', dept, name, num , question, tel)
     
 
 # ================================================================================
@@ -126,8 +121,8 @@ class Gui_For_Office:
 
 # ================================================================================ start page 
         
-        self.start_page = Frame(self.master, bg="gray")
-        start_page_middle = Frame(self.start_page,bg = "white")
+        self.start_page = Frame(self.master)
+        start_page_middle = Frame(self.start_page)
 
         # Label of notice
         Label(start_page_middle, text = "請選擇身份", font = ("微軟正黑體",30)).pack(pady = 20)
