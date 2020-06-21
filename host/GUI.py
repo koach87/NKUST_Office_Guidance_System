@@ -2,9 +2,8 @@ from tkinter import *
 from tkinter import messagebox
 import pandas as pd
 import webbrowser
-from openpyxl import Workbook, load_workbook
-from os import path
-from datetime import datetime
+import storage
+import net
 
 class Gui_For_Office:
 
@@ -12,25 +11,14 @@ class Gui_For_Office:
         self.master = master
         self.initUI()
 
-    def callback(self,url):
+    def callback(self, url):
         webbrowser.open_new(url)
-
-    def add_data_to_history(self, identity, number, name, dept, question):
-
-        now = datetime.now()
-        time = now.strftime("%Y/%m/%d %H:%M")
-
-        wb = load_workbook(filename = self.history_file_name)
-        ws = wb.active
-        data = [time, identity, number, name, dept, question]
-        row_add = ws.max_row+1
-        for i, x in enumerate(data):
-            print(x, i)
-            ws.cell(column=i+1, row=row_add, value = x)
-        
-        wb.save(self.history_file_name)
-        
-        
+    
+    def send_message(self, identity, dept, name, num , question, tel):
+        try:
+            net.host("{} {}系學生{}\n學號:{}\n辦理{}".format(identity, dept, name, num, question), tel)
+        except ConnectionRefusedError:
+            print('cannot link') 
 
     def to_start_page(self):
         self.btn_cancel.pack_forget()
@@ -77,15 +65,16 @@ class Gui_For_Office:
         else:
             messagebox.showerror('找不到該學號','請重新輸入，或至點擊下方連結查詢學號')
         
-        
-
-
+# ================================================================================
+    # return action
     def return_tchr_dept(self, dept_index):
-        self.xls_dept_seat = pd.read_excel("GUI_services.xlsx", sheet_name= 1 )
+        
       
 
         messagebox.showinfo('國立高雄科技大學進推處教務組','請老師至 {} 號櫃台，由承辦人員為您服務。'
                             .format(self.xls_dept_seat.values[dept_index][1]))
+        # print(self.xls_dept_seat['分機0'][dept_index])
+        self.send_message('老師', self.dept_list[dept_index], '', '', '', self.xls_dept_seat['分機0'][dept_index])
 
         # import net
         # try:
@@ -93,11 +82,9 @@ class Gui_For_Office:
         # except ConnectionRefusedError:
         #     print('cannot link')      
 
-        self.add_data_to_history('導師','','',self.dept_list[dept_index],'')
+        storage.add_data_to_history('導師','','',self.dept_list[dept_index],'')
 
         self.to_start_page()
-            
-        
 
     def return_question(self,question_index):
         num = self.std_id.get() 
@@ -108,14 +95,15 @@ class Gui_For_Office:
         question =  self.xls_services.values[question_index][0]
         question_remarks = self.xls_services.values[question_index][1]
 
-        print(num, dept, name, question)
+        # print(num, dept, name, question)
                 
         messagebox.showinfo("國立高雄科技大學進推處教務組","{} \n請至 {} 號櫃台\n備註:\n{}"
                                 .format(question, dept_num, question_remarks))
         print("分機:{}".format(tel))
 
         self.to_start_page()
-        self.add_data_to_history('學生', num, name, dept, question)
+        
+        storage.add_data_to_history('學生', num, name, dept, question)
 
         # import net
         # try:
@@ -123,10 +111,10 @@ class Gui_For_Office:
         # except ConnectionRefusedError:
         #     print('cannot link') 
     
+
+# ================================================================================
+# initialization UI
     def initUI(self):
-
-
-        # set UI 
         self.master.iconbitmap("nkust.ico")
         self.master.state("zoom")
         self.master.title("Office Guidance System")
@@ -202,10 +190,8 @@ class Gui_For_Office:
 
 
 # ================================================================================ teacher's page
-        
-        self.dept_list = ''
-        with open('GUI_dept.txt', encoding= 'UTF-8') as f:
-            self.dept_list = f.read().split(' ')
+        self.xls_dept_seat = pd.read_excel("GUI_services.xlsx", sheet_name= 1 )
+        self.dept_list = self.xls_dept_seat['科系']
 
         self.tchr_page = Frame(self.master)
         Label(self.tchr_page, font = ("微軟正黑體",30), text = "請選擇所屬科系").pack()
@@ -221,6 +207,7 @@ class Gui_For_Office:
                 b.grid(row = i, column = j, padx = 40, pady = 40)
 
 
+# ================================================================================ image frame
         
         # # nkust image
         # im = PhotoImage(file = "nkust.gif")
@@ -228,26 +215,10 @@ class Gui_For_Office:
         # aa = Canvas(self.master)
         # aa.pack()
         # aa.create_image(20,20, image = im)
-
-
-        # self.questions_page.pack()
-        # self.std_page.pack()
         
 
-        month = datetime.today().strftime('%m')
-        self.history_file_name = '進推處教務組{}月承辦紀錄.xlsx'.format(month)
-        print(self.history_file_name)
-        # print(path.exists(history_file_name))
-        if not (path.exists(self.history_file_name)):
-            wb = Workbook()
-            ws = wb.active
-            data = ['時間', '身分', '學號', '姓名', '科系', '事項']
-            for i, x in enumerate(data):
-                print(x, i)
-                ws.cell(column=i+1, row=1, value = x)
-            
-            wb.save(self.history_file_name)
-
+# ================================================================================ check history data exist and start working
+        storage.check_data_exist()
         self.to_start_page()
     
 
